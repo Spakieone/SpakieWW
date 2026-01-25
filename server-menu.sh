@@ -137,9 +137,10 @@ show_server_menu() {
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo -e "  ${GREEN}13.${NC} ${YELLOW}💾 Создать Swap${NC}            — swapfile"
-    echo -e "  ${GREEN}14.${NC} ${YELLOW}🛡️  Установить TBlocker${NC}     — защита от ботов"
+    echo -e "  ${GREEN}14.${NC} ${YELLOW}🛡️  Установить TBlocker${NC}     — блокировщик торрентов"
     echo -e "  ${GREEN}15.${NC} ${YELLOW}📝 Настройки TBlocker${NC}       — конфиг/статус/перезапуск"
     echo -e "  ${GREEN}16.${NC} ${YELLOW}❌ Удалить TBlocker${NC}         — полное удаление"
+    echo -e "  ${GREEN}17.${NC} ${YELLOW}🚀 Zapret (обход DPI)${NC}       — разблокировка сайтов"
     echo ""
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "  ${GREEN}0.${NC}  ${WHITE}Назад${NC}"
@@ -482,6 +483,9 @@ EOF
         apt update -qq && apt install -y ufw >/dev/null 2>&1
     fi
     
+    # Отключаем IPv6 в UFW
+    sed -i 's/^IPV6=yes/IPV6=no/' /etc/default/ufw 2>/dev/null
+    
     ufw --force reset >/dev/null 2>&1
     ufw default deny incoming >/dev/null 2>&1
     ufw default allow outgoing >/dev/null 2>&1
@@ -624,6 +628,8 @@ setup_ufw_quick() {
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         echo ""
         echo -e "${YELLOW}Применяем...${NC}"
+        # Отключаем IPv6 в UFW
+        sed -i 's/^IPV6=yes/IPV6=no/' /etc/default/ufw 2>/dev/null
         ufw --force reset
         ufw default deny incoming
         ufw default allow outgoing
@@ -990,10 +996,24 @@ useful_loop() {
     done
 }
 
-# Установить TBlocker
+# Установить TBlocker для Remnawave/Remnanode (автономная установка)
 install_tblocker() {
     show_header
-    echo -e "${YELLOW}🛡️ Установка TBlocker${NC}"
+    echo -e "${YELLOW}🛡️ Установка TBlocker для Remnawave${NC}"
+    echo ""
+    
+    # Проверяем наличие RemnaNode
+    if [[ ! -d "/opt/remnanode" ]]; then
+        echo -e "${RED}❌ RemnaNode не найден в /opt/remnanode${NC}"
+        echo ""
+        echo -e "${YELLOW}TBlocker требует установленный RemnaNode.${NC}"
+        echo -e "${CYAN}Сначала установите RemnaNode, затем запустите установку TBlocker.${NC}"
+        echo ""
+        read -p "Нажмите Enter для продолжения..."
+        return
+    fi
+    
+    echo -e "${GREEN}✓ RemnaNode найден${NC}"
     echo ""
     
     # Проверяем, установлен ли уже
@@ -1005,33 +1025,242 @@ install_tblocker() {
         echo -ne "${CYAN}Переустановить? [y/N]: ${NC}"
         read -r reinstall
         [[ ! "$reinstall" =~ ^[Yy]$ ]] && return
+        # Останавливаем для переустановки
+        systemctl stop tblocker 2>/dev/null
     fi
     
-    echo -e "${CYAN}TBlocker — защита от ботов и нежелательного трафика${NC}"
+    echo -e "${CYAN}TBlocker — блокировщик торрентов для Remnawave${NC}"
+    echo -e "${GRAY}GitHub: github.com/kutovoys/xray-torrent-blocker${NC}"
     echo ""
-    echo -ne "${CYAN}Установить TBlocker? [y/N]: ${NC}"
+    echo -e "${YELLOW}Возможности:${NC}"
+    echo -e "  • Мониторинг логов на торрент-активность"
+    echo -e "  • Блокировка IP через iptables/nftables"
+    echo -e "  • Разрыв соединений через conntrack"
+    echo -e "  • Webhook-уведомления"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}⚠️  ВАЖНО: Перед установкой настройте логирование в RemnaNode!${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${CYAN}1. Создайте папку для логов:${NC}"
+    echo -e "   ${GRAY}mkdir -p /var/log/remnanode${NC}"
+    echo ""
+    echo -e "${CYAN}2. Добавьте volume в docker-compose.yml remnanode:${NC}"
+    echo -e "   ${GRAY}volumes:${NC}"
+    echo -e "   ${GRAY}  - \"/var/log/remnanode:/var/log/remnanode\"${NC}"
+    echo ""
+    echo -e "${CYAN}3. Настройте логирование в xray конфиге:${NC}"
+    echo -e "   ${GRAY}\"log\": {${NC}"
+    echo -e "   ${GRAY}    \"error\": \"/var/log/remnanode/error.log\",${NC}"
+    echo -e "   ${GRAY}    \"access\": \"/var/log/remnanode/access.log\",${NC}"
+    echo -e "   ${GRAY}    \"loglevel\": \"error\"${NC}"
+    echo -e "   ${GRAY}}${NC}"
+    echo ""
+    echo -e "${CYAN}4. Перезапустите remnanode${NC}"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -ne "${CYAN}Продолжить установку TBlocker? [y/N]: ${NC}"
     read -r confirm
     
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        echo ""
-        echo -e "${YELLOW}Скачиваем и запускаем установщик...${NC}"
-        echo ""
-        
-        # Скачиваем и запускаем установочный скрипт напрямую (без менеджера)
-        curl -fsSL https://raw.githubusercontent.com/Kepismb163/tblocker-installer/main/install-tblocker.sh -o /tmp/install-tblocker.sh
-        
-        if [[ -f /tmp/install-tblocker.sh ]]; then
-            chmod +x /tmp/install-tblocker.sh
-            bash /tmp/install-tblocker.sh
-            rm -f /tmp/install-tblocker.sh
-            echo ""
-            echo -e "${GREEN}✅ Установка завершена!${NC}"
-        else
-            echo -e "${RED}❌ Не удалось скачать установщик${NC}"
-        fi
-    else
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}Отменено${NC}"
+        read -p "Нажмите Enter для продолжения..."
+        return
     fi
+    
+    echo ""
+    
+    # ===== НАСТРОЙКА =====
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  НАСТРОЙКА${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    # Выбор файрвола
+    echo -e "${YELLOW}Выберите файрвол:${NC}"
+    echo -e "  ${GREEN}1.${NC} iptables (рекомендуется)"
+    echo -e "  ${GREEN}2.${NC} nftables"
+    echo ""
+    echo -ne "${CYAN}Выбор [1]: ${NC}"
+    read -r fw_choice
+    
+    local block_mode="iptables"
+    if [[ "$fw_choice" == "2" ]]; then
+        block_mode="nft"  # официальное значение для nftables
+    fi
+    
+    # Время блокировки
+    echo ""
+    echo -ne "${CYAN}Время блокировки в минутах [10]: ${NC}"
+    read -r block_duration
+    block_duration=${block_duration:-10}
+    # Проверяем что это число
+    if ! [[ "$block_duration" =~ ^[0-9]+$ ]]; then
+        block_duration=10
+    fi
+    
+    echo ""
+    
+    # ===== УСТАНОВКА =====
+    echo -e "${YELLOW}Начинаем установку...${NC}"
+    echo ""
+    
+    # Устанавливаем зависимости
+    echo -e "  ${CYAN}[1/6]${NC} Установка зависимостей..."
+    apt-get update -qq >/dev/null 2>&1
+    if ! apt-get install -y -qq conntrack curl >/dev/null 2>&1; then
+        echo -e "  ${YELLOW}⚠${NC} Не удалось установить некоторые зависимости (продолжаем)"
+    else
+        echo -e "  ${GREEN}✓${NC} Зависимости установлены"
+    fi
+    
+    # Определяем архитектуру
+    echo -e "  ${CYAN}[2/6]${NC} Определение архитектуры..."
+    local arch
+    case $(uname -m) in
+        x86_64)  arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+        armv7l)  arch="arm" ;;
+        *)
+            echo -e "  ${RED}✗${NC} Неподдерживаемая архитектура: $(uname -m)"
+            read -p "Нажмите Enter для продолжения..."
+            return
+            ;;
+    esac
+    echo -e "  ${GREEN}✓${NC} Архитектура: ${arch}"
+    
+    # Получаем последнюю версию
+    echo -e "  ${CYAN}[3/6]${NC} Получение последней версии..."
+    local latest_version
+    latest_version=$(curl -fsSL --connect-timeout 10 "https://api.github.com/repos/kutovoys/xray-torrent-blocker/releases/latest" 2>/dev/null | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+    
+    if [[ -z "$latest_version" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} Не удалось получить версию с GitHub API"
+        echo -e "  ${CYAN}→${NC} Используем последнюю известную версию: v1.1.0"
+        latest_version="v1.1.0"
+    fi
+    echo -e "  ${GREEN}✓${NC} Версия: ${latest_version}"
+    
+    # Скачиваем бинарник
+    echo -e "  ${CYAN}[4/6]${NC} Скачивание бинарника..."
+    local download_url="https://github.com/kutovoys/xray-torrent-blocker/releases/download/${latest_version}/tblocker_${latest_version#v}_linux_${arch}.tar.gz"
+    
+    mkdir -p /opt/tblocker
+    
+    if ! curl -fsSL "$download_url" -o /tmp/tblocker.tar.gz; then
+        echo -e "  ${RED}✗${NC} Ошибка скачивания"
+        echo -e "  ${GRAY}URL: ${download_url}${NC}"
+        read -p "Нажмите Enter для продолжения..."
+        return
+    fi
+    
+    # Распаковываем архив
+    if ! tar -xzf /tmp/tblocker.tar.gz -C /opt/tblocker 2>/dev/null; then
+        echo -e "  ${RED}✗${NC} Ошибка распаковки архива"
+        rm -f /tmp/tblocker.tar.gz
+        read -p "Нажмите Enter для продолжения..."
+        return
+    fi
+    rm -f /tmp/tblocker.tar.gz
+    
+    # Проверяем что бинарник существует
+    if [[ ! -f /opt/tblocker/tblocker ]]; then
+        echo -e "  ${RED}✗${NC} Бинарник не найден после распаковки"
+        read -p "Нажмите Enter для продолжения..."
+        return
+    fi
+    
+    chmod +x /opt/tblocker/tblocker
+    echo -e "  ${GREEN}✓${NC} Бинарник установлен в /opt/tblocker/"
+    
+    # Создаём папку для логов если её нет
+    if [[ ! -d /var/log/remnanode ]]; then
+        mkdir -p /var/log/remnanode
+        echo -e "  ${GREEN}✓${NC} Создана папка /var/log/remnanode"
+    fi
+    
+    # Создаём конфиг
+    echo -e "  ${CYAN}[5/6]${NC} Создание конфигурации..."
+    cat > /opt/tblocker/config.yaml << EOF
+# TBlocker configuration for Remnawave
+# GitHub: github.com/kutovoys/xray-torrent-blocker
+
+# Путь к лог-файлу Xray (Remnawave)
+LogFile: "/var/log/remnanode/access.log"
+
+# Время блокировки в минутах
+BlockDuration: ${block_duration}
+
+# Тег для определения торрент-трафика в логах
+TorrentTag: "TORRENT"
+
+# Файрвол для блокировки (iptables, nft)
+BlockMode: "${block_mode}"
+
+# IP-адреса для исключения из блокировки
+BypassIPS:
+  - "127.0.0.1"
+  - "::1"
+
+# Директория для хранения данных о блокировках
+StorageDir: "/opt/tblocker"
+
+# Игнорировать отсутствие email в логах (для TPROXY)
+IgnoreEmail: false
+
+# Webhook настройки (опционально)
+SendWebhook: false
+# WebhookURL: "https://your-webhook-url.com/endpoint"
+# WebhookTemplate: '{"username":"%s","ip":"%s","server":"%s","action":"%s","duration":%d,"timestamp":"%s"}'
+# WebhookHeaders:
+#   Authorization: "Bearer your-token"
+#   Content-Type: "application/json"
+EOF
+    echo -e "  ${GREEN}✓${NC} Конфиг создан: /opt/tblocker/config.yaml"
+    
+    # Создаём systemd сервис
+    echo -e "  ${CYAN}[6/6]${NC} Настройка systemd сервиса..."
+    cat > /etc/systemd/system/tblocker.service << 'EOF'
+[Unit]
+Description=Xray Torrent Blocker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tblocker
+ExecStart=/opt/tblocker/tblocker
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    
+    systemctl daemon-reload
+    systemctl enable tblocker >/dev/null 2>&1
+    systemctl start tblocker
+    echo -e "  ${GREEN}✓${NC} Сервис запущен"
+    
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Проверяем результат
+    sleep 2
+    if systemctl is-active --quiet tblocker; then
+        echo -e "${GREEN}✅ TBlocker успешно установлен и запущен!${NC}"
+        echo ""
+        echo -e "${CYAN}Конфиг:${NC}    /opt/tblocker/config.yaml"
+        echo -e "${CYAN}Файрвол:${NC}   ${block_mode}"
+        echo -e "${CYAN}Блокировка:${NC} ${block_duration} мин"
+        echo -e "${CYAN}Логи:${NC}      journalctl -u tblocker -f"
+    else
+        echo -e "${RED}❌ Ошибка запуска сервиса${NC}"
+        echo ""
+        journalctl -u tblocker -n 10 --no-pager
+    fi
+    
+    echo ""
     read -p "Нажмите Enter для продолжения..."
 }
 
@@ -1203,6 +1432,71 @@ remove_tblocker() {
     read -p "Нажмите Enter для продолжения..."
 }
 
+# Установить Zapret (обход DPI блокировок)
+install_zapret() {
+    show_header
+    echo -e "${YELLOW}🚀 Zapret — обход DPI блокировок${NC}"
+    echo -e "${GRAY}GitHub: github.com/IndeecFOX/zapret4rocket${NC}"
+    echo ""
+    
+    # Проверяем, установлен ли уже
+    if [[ -d /opt/zapret ]] || command -v z4r &>/dev/null; then
+        echo -e "${GREEN}Zapret уже установлен${NC}"
+        echo ""
+        echo -e "${CYAN}Для управления используйте команду:${NC} ${WHITE}z4r${NC}"
+        echo ""
+        echo -ne "${CYAN}Открыть меню Zapret? [Y/n]: ${NC}"
+        read -r open_menu
+        if [[ ! "$open_menu" =~ ^[Nn]$ ]]; then
+            z4r
+        fi
+        return
+    fi
+    
+    echo -e "${CYAN}Zapret — инструмент для обхода блокировок DPI${NC}"
+    echo ""
+    echo -e "${YELLOW}Возможности:${NC}"
+    echo -e "  • Обход замедления YouTube"
+    echo -e "  • Разблокировка Discord, Telegram, WhatsApp"
+    echo -e "  • Доступ к заблокированным сайтам"
+    echo -e "  • Подбор стратегий под вашего провайдера"
+    echo ""
+    echo -e "${YELLOW}Поддерживаемые системы:${NC}"
+    echo -e "  • Ubuntu 22/24, Debian 12"
+    echo -e "  • OpenWRT, Keenetic (Entware)"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -ne "${CYAN}Установить Zapret? [y/N]: ${NC}"
+    read -r confirm
+    
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        echo ""
+        echo -e "${YELLOW}Запускаем установщик Zapret...${NC}"
+        echo -e "${GRAY}(На все вопросы можно нажимать Enter для значений по умолчанию)${NC}"
+        echo ""
+        
+        # Скачиваем и запускаем z4r
+        curl -fsSL -O https://raw.githubusercontent.com/IndeecFOX/z4r/4/z4r && sh z4r
+        
+        echo ""
+        
+        # Проверяем успешность установки
+        if [[ -d /opt/zapret ]] || command -v z4r &>/dev/null; then
+            echo -e "${GREEN}✅ Zapret установлен!${NC}"
+            echo ""
+            echo -e "${CYAN}Для управления используйте команду:${NC} ${WHITE}z4r${NC}"
+        else
+            echo -e "${YELLOW}Установка завершена. Проверьте вывод выше.${NC}"
+        fi
+    else
+        echo -e "${YELLOW}Отменено${NC}"
+    fi
+    
+    echo ""
+    read -p "Нажмите Enter для продолжения..."
+}
+
 # Цикл настройки сервера
 server_loop() {
     while true; do
@@ -1225,6 +1519,7 @@ server_loop() {
             14) install_tblocker ;;
             15) manage_tblocker ;;
             16) remove_tblocker ;;
+            17) install_zapret ;;
             0) return ;;
             *) echo -e "${RED}Неверный выбор${NC}"; sleep 1 ;;
         esac
