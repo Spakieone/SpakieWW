@@ -2,7 +2,7 @@
 set -uo pipefail
 
 # ============================================
-# REMNA SERVER MENU
+# SCRIPTS by Spakie
 # ============================================
 
 # Проверка root
@@ -30,14 +30,14 @@ show_header() {
     clear
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║${NC}                                                                ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}██████╗ ███████╗███╗   ███╗███╗   ██╗ █████╗${NC}              ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}██╔══██╗██╔════╝████╗ ████║████╗  ██║██╔══██╗${NC}             ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}██████╔╝█████╗  ██╔████╔██║██╔██╗ ██║███████║${NC}             ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}██╔══██╗██╔══╝  ██║╚██╔╝██║██║╚██╗██║██╔══██║${NC}             ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}██║  ██║███████╗██║ ╚═╝ ██║██║ ╚████║██║  ██║${NC}             ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}   ${WHITE}╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝${NC}             ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}███████╗ ██████╗██████╗ ██╗██████╗ ████████╗███████╗${NC}       ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝██╔════╝${NC}       ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}███████╗██║     ██████╔╝██║██████╔╝   ██║   ███████╗${NC}       ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}╚════██║██║     ██╔══██╗██║██╔═══╝    ██║   ╚════██║${NC}       ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}███████║╚██████╗██║  ██║██║██║        ██║   ███████║${NC}       ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}   ${WHITE}╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   ╚══════╝${NC}       ${CYAN}║${NC}"
     echo -e "${CYAN}║${NC}                                                                ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}            ${YELLOW}МЕНЮ УПРАВЛЕНИЯ СЕРВЕРОМ${NC}                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}                      ${YELLOW}by Spakie${NC}                                ${CYAN}║${NC}"
     echo -e "${CYAN}║${NC}                                                                ${CYAN}║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
@@ -48,14 +48,34 @@ show_header() {
 # ============================================
 show_main_menu() {
     show_header
+    
+    # Проверяем статусы сервисов
+    local tblocker_status="${RED}○${NC}"
+    if systemctl is-active --quiet tblocker 2>/dev/null; then
+        tblocker_status="${GREEN}●${NC}"
+    elif [[ -f /opt/tblocker/tblocker ]]; then
+        tblocker_status="${YELLOW}○${NC}"
+    fi
+    
+    local zapret_status="${RED}○${NC}"
+    if systemctl is-active --quiet zapret 2>/dev/null; then
+        zapret_status="${GREEN}●${NC}"
+    elif [[ -d /opt/zapret ]]; then
+        zapret_status="${YELLOW}○${NC}"
+    fi
+    
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${WHITE}  🛠️  ГЛАВНОЕ МЕНЮ${NC}"
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${GREEN}1.${NC} ${YELLOW}⚡ Обновить систему${NC}"
-    echo -e "  ${GREEN}2.${NC} ${YELLOW}📊 Статус системы${NC}"
-    echo -e "  ${GREEN}3.${NC} ${YELLOW}💡 Полезные команды${NC}"
-    echo -e "  ${GREEN}4.${NC} ${YELLOW}⚙️  Настройка сервера${NC}"
+    echo -e "  ${CYAN}Статус:${NC} TBlocker ${tblocker_status}  Zapret ${zapret_status}"
+    echo ""
+    echo -e "  ${GREEN}1.${NC} ${YELLOW}💡 Полезные команды${NC}        — тесты, статус, логи"
+    echo -e "  ${GREEN}2.${NC} ${YELLOW}⚙️  Настройка сервера${NC}       — UFW, SSH, BBR, Swap"
+    echo -e "  ${GREEN}3.${NC} ${YELLOW}🔧 Утилиты${NC}                 — TBlocker, Zapret"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${GREEN}4.${NC} ${YELLOW}🚀 Установка Remna${NC}         — Panel/Node by Capybara"
     echo ""
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "  ${GREEN}0.${NC} ${WHITE}Выход${NC}"
@@ -83,10 +103,8 @@ show_useful_menu() {
     echo -e "  ${GREEN}8.${NC} ${YELLOW}🖥️  YABS тест сервера${NC}       — CPU, диск, сеть"
     echo ""
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "  ${GREEN}9.${NC} ${YELLOW}📊 Сводка системы${NC}          — диск/память/uptime"
-    echo -e "  ${GREEN}10.${NC} ${YELLOW}🌐 Сеть и порты${NC}            — IP и слушающие порты"
-    echo -e "  ${GREEN}11.${NC} ${YELLOW}🐳 Docker статус${NC}           — контейнеры"
-    echo -e "  ${GREEN}12.${NC} ${YELLOW}📝 Логи${NC}                   — journalctl"
+    echo -e "  ${GREEN}9.${NC} ${YELLOW}🌐 Сеть и порты${NC}            — IP и слушающие порты"
+    echo -e "  ${GREEN}10.${NC} ${YELLOW}🐳 Docker статус${NC}           — контейнеры"
     echo ""
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "  ${GREEN}0.${NC} ${WHITE}Назад${NC}"
@@ -137,13 +155,39 @@ show_server_menu() {
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo -e "  ${GREEN}13.${NC} ${YELLOW}💾 Создать Swap${NC}            — swapfile"
-    echo -e "  ${GREEN}14.${NC} ${YELLOW}🛡️  Установить TBlocker${NC}     — блокировщик торрентов"
-    echo -e "  ${GREEN}15.${NC} ${YELLOW}📝 Настройки TBlocker${NC}       — конфиг/статус/перезапуск"
-    echo -e "  ${GREEN}16.${NC} ${YELLOW}❌ Удалить TBlocker${NC}         — полное удаление"
-    echo -e "  ${GREEN}17.${NC} ${YELLOW}🚀 Zapret (обход DPI)${NC}       — разблокировка сайтов"
     echo ""
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "  ${GREEN}0.${NC}  ${WHITE}Назад${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -ne "${CYAN}Выберите пункт: ${NC}"
+}
+
+# ============================================
+# ПРОГРАММЫ
+# ============================================
+show_programs_menu() {
+    show_header
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${WHITE}  🔧 УТИЛИТЫ${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${WHITE}  🛡️  TBLOCKER — блокировщик торрентов${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ${GREEN}1.${NC} ${YELLOW}🛡️  Установить TBlocker${NC}"
+    echo -e "  ${GREEN}2.${NC} ${YELLOW}📝 Настройки TBlocker${NC}"
+    echo -e "  ${GREEN}3.${NC} ${YELLOW}❌ Удалить TBlocker${NC}"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${WHITE}  🚀 ZAPRET — обход DPI блокировок${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ${GREEN}4.${NC} ${YELLOW}🚀 Установить Zapret${NC}"
+    echo ""
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${GREEN}0.${NC} ${WHITE}Назад${NC}"
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт: ${NC}"
@@ -986,10 +1030,8 @@ useful_loop() {
             6) check_instagram ;;
             7) check_media_services ;;
             8) run_yabs ;;
-            9) system_summary ;;
-            10) network_ports ;;
-            11) docker_status ;;
-            12) show_logs ;;
+            9) network_ports ;;
+            10) docker_status ;;
             0) return ;;
             *) echo -e "${RED}Неверный выбор${NC}"; sleep 1 ;;
         esac
@@ -1022,7 +1064,6 @@ install_tblocker() {
     echo -e "${YELLOW}Скрипт автоматически:${NC}"
     echo -e "  • Создаст папку для логов"
     echo -e "  • Добавит volume в docker-compose.yml"
-    echo -e "  • Настроит xray конфиг"
     echo -e "  • Перезапустит RemnaNode"
     echo -e "  • Установит и запустит TBlocker"
     echo ""
@@ -1036,18 +1077,20 @@ install_tblocker() {
     fi
     
     echo ""
-    echo -e "${YELLOW}Скачиваем и запускаем установщик...${NC}"
-    echo ""
     
-    # Скачиваем и запускаем скрипт установки из нашего репозитория
-    curl -fsSL https://raw.githubusercontent.com/Spakieone/SpakieWW/main/install-tblocker.sh -o /tmp/install-tblocker.sh
-    
-    if [[ -f /tmp/install-tblocker.sh ]]; then
-        chmod +x /tmp/install-tblocker.sh
-        bash /tmp/install-tblocker.sh
-        rm -f /tmp/install-tblocker.sh
+    # Пробуем локальный скрипт, иначе скачиваем с GitHub
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+    if [[ -f "${SCRIPT_DIR}/install-tblocker.sh" ]]; then
+        bash "${SCRIPT_DIR}/install-tblocker.sh"
     else
-        echo -e "${RED}❌ Не удалось скачать установщик${NC}"
+        echo -e "${YELLOW}Скачиваем установщик...${NC}"
+        curl -fsSL https://raw.githubusercontent.com/Spakieone/SpakieWW/main/install-tblocker.sh -o /tmp/install-tblocker.sh
+        if [[ -f /tmp/install-tblocker.sh ]]; then
+            bash /tmp/install-tblocker.sh
+            rm -f /tmp/install-tblocker.sh
+        else
+            echo -e "${RED}❌ Не удалось скачать установщик${NC}"
+        fi
     fi
     
     echo ""
@@ -1306,14 +1349,55 @@ server_loop() {
             11) setup_security ;;
             12) create_user ;;
             13) setup_swap ;;
-            14) install_tblocker ;;
-            15) manage_tblocker ;;
-            16) remove_tblocker ;;
-            17) install_zapret ;;
             0) return ;;
             *) echo -e "${RED}Неверный выбор${NC}"; sleep 1 ;;
         esac
     done
+}
+
+# Цикл программ
+programs_loop() {
+    while true; do
+        show_programs_menu
+        read -r choice
+        case $choice in
+            1) install_tblocker ;;
+            2) manage_tblocker ;;
+            3) remove_tblocker ;;
+            4) install_zapret ;;
+            0) return ;;
+            *) echo -e "${RED}Неверный выбор${NC}"; sleep 1 ;;
+        esac
+    done
+}
+
+# Установка Remna Panel/Node by Capybara
+install_remna_capybara() {
+    show_header
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${WHITE}  🚀 УСТАНОВКА REMNA PANEL/NODE${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${CYAN}Установщик от Capybara${NC}"
+    echo -e "${GRAY}GitHub: github.com/Capybara-z/RemnaSetup${NC}"
+    echo ""
+    echo -e "${YELLOW}Этот скрипт установит:${NC}"
+    echo -e "  • Remna Panel — панель управления"
+    echo -e "  • Remna Node — нода для подключений"
+    echo ""
+    echo -ne "${CYAN}Запустить установщик? [y/N]: ${NC}"
+    read -r confirm
+    
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Отменено${NC}"
+        read -p "Нажмите Enter для продолжения..."
+        return
+    fi
+    
+    echo ""
+    bash <(curl -fsSL raw.githubusercontent.com/Capybara-z/RemnaSetup/refs/heads/main/install.sh)
+    echo ""
+    read -p "Нажмите Enter для продолжения..."
 }
 
 # ============================================
@@ -1323,10 +1407,10 @@ while true; do
     show_main_menu
     read -r choice
     case $choice in
-        1) update_system ;;
-        2) system_status ;;
-        3) useful_loop ;;
-        4) server_loop ;;
+        1) useful_loop ;;
+        2) server_loop ;;
+        3) programs_loop ;;
+        4) install_remna_capybara ;;
         0)
             echo ""
             echo -e "${GREEN}👋 До свидания!${NC}"
