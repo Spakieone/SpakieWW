@@ -156,35 +156,35 @@ quick_menu() {
         draw_header "Полезные команды" "Главная › Полезные"
 
         section "Мониторинг в реальном времени"
-        menu_item 1 "📈" "btop / htop"     "что грузит систему"
-        menu_item 2 "📡" "nethogs"         "трафик по процессам"
-        menu_item 3 "📊" "iftop"           "трафик по соединениям"
-        menu_item 4 "💾" "iotop"           "I/O по процессам"
+        menu_item 1 "📈" "btop / htop"        "Интерактивный монитор CPU, RAM и процессов."
+        menu_item 2 "📡" "nethogs"            "Трафик по каждому процессу в реальном времени."
+        menu_item 3 "📊" "iftop"              "Трафик по сетевым соединениям с гео-данными."
+        menu_item 4 "💾" "iotop"              "Какой процесс грузит диск чтением и записью."
 
         section "Состояние"
-        menu_item 5 "🔝" "Топ процессов"   "CPU + RAM"
-        menu_item 6 "💽" "Использование диска" "df + du"
-        menu_item 7 "⏱" "Uptime / who"    "кто залогинен"
-        menu_item 8 "📦" "Размер логов"    "journal + /var/log"
+        menu_item 5 "🔝" "Топ процессов"      "Список 10 самых прожорливых процессов по CPU и RAM."
+        menu_item 6 "💽" "Использование диска" "df -h по разделам и du по самым крупным папкам."
+        menu_item 7 "⏱" "Uptime / who"       "Время работы сервера и список залогиненных пользователей."
+        menu_item 8 "📦" "Размер логов"       "Объём journald и топ-10 крупных файлов в /var/log."
 
         section "Сеть"
-        menu_item 9  "🔌" "Занятые порты"   "ss -tulpn"
-        menu_item 10 "🌐" "TCP-соединения"  "established"
-        menu_item 11 "🔐" "SSH сессии"      "who + last + failed"
-        menu_item 12 "🌍" "Внешний IP / DNS" "проверка резолва"
+        menu_item 9  "🔌" "Занятые порты"     "Все слушающие TCP/UDP порты с привязкой к процессам."
+        menu_item 10 "🌐" "TCP-соединения"    "Активные established-соединения сервера."
+        menu_item 11 "🔐" "SSH сессии"        "Кто залогинен, история входов, неуспешные попытки SSH."
+        menu_item 12 "🌍" "Внешний IP / DNS"  "Внешний IP сервера и проверка резолва DNS-имён."
 
         section "Docker"
-        menu_item 13 "🐳" "docker ps"      "список контейнеров"
-        menu_item 14 "📜" "Логи контейнера" "выбрать из списка"
-        menu_item 15 "📈" "docker stats"   "ресурсы контейнеров"
-        menu_item 16 "🧹" "system prune"   "очистить мусор"
+        menu_item 13 "🐳" "docker ps"         "Список запущенных контейнеров с портами и статусом."
+        menu_item 14 "📜" "Логи контейнера"   "Выбрать контейнер из списка и смотреть логи в реальном времени."
+        menu_item 15 "📈" "docker stats"      "Потребление CPU, RAM и сети каждым контейнером."
+        menu_item 16 "🧹" "system prune"      "Удалить остановленные контейнеры, неиспользуемые образы и сети."
 
         section "Логи системы"
-        menu_item 17 "🚨" "Ошибки journal"  "p err -n 50"
-        menu_item 18 "🧠" "dmesg"          "события ядра"
+        menu_item 17 "🚨" "Ошибки journal"    "Последние 50 ошибок ядра и системных служб."
+        menu_item 18 "🧠" "dmesg"             "События ядра: диски, USB, OOM-killer, паника."
 
         draw_line
-        menu_item 0 "↩" "Назад" ""
+        menu_item 0 "↩" "Назад"               "Вернуться в главное меню."
         draw_line
 
         local ch; prompt "Выбор:" ch

@@ -73,16 +73,16 @@ remnawave_menu() {
         draw_header "Remnawave / Remnanode" "Главная › Remnawave"
 
         section "Установка"
-        menu_item 1 "🎛" "RemnaSetup" "Capybara: Panel + Node + Caddy"
-        menu_item 2 "🧰" "Reshala"    "TUI-менеджер"
-        menu_item 3 "🆘" "Grace Access" "доступ для EXPIRED/LIMITED"
+        menu_item 1 "🎛" "RemnaSetup"   "Установка Panel и Node от Capybara, включая Caddy."
+        menu_item 2 "🧰" "Reshala"      "TUI-менеджер серверов с интеграцией Remnawave."
+        menu_item 3 "🆘" "Grace Access" "Worker для временного доступа подпискам EXPIRED/LIMITED."
 
         section "Управление нодой"
-        menu_item 4 "📜" "Логи Remnanode"   "docker logs -f"
-        menu_item 5 "🔄" "Рестарт Remnanode" "docker restart"
+        menu_item 4 "📜" "Логи Remnanode"   "Просмотр логов контейнера remnanode в реальном времени."
+        menu_item 5 "🔄" "Рестарт Remnanode" "Перезапуск контейнера remnanode без потери данных."
 
         draw_line
-        menu_item 0 "↩" "Назад" ""
+        menu_item 0 "↩" "Назад" "Вернуться в главное меню."
         draw_line
 
         local ch; prompt "Выбор:" ch

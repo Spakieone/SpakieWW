@@ -26,13 +26,13 @@ install_menu() {
         draw_header "Установки и защита" "Главная › Установки"
 
         section "Ядро и сеть"
-        menu_item 1 "🚀" "Node-Accelerator" "XanMod+BBRv3+nftables+CrowdSec"
+        menu_item 1 "🚀" "Node-Accelerator" "Ядро XanMod с BBRv3, nftables-firewall и CrowdSec IPS."
 
         section "Защита трафика"
-        menu_item 2 "🛡" "TrafficGuard-auto" "защита от сканеров портов"
+        menu_item 2 "🛡" "TrafficGuard-auto" "Защита от сканеров портов через ipset и iptables."
 
         draw_line
-        menu_item 0 "↩" "Назад" ""
+        menu_item 0 "↩" "Назад" "Вернуться в главное меню."
         draw_line
 
         local ch; prompt "Выбор:" ch

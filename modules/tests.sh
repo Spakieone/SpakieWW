@@ -50,25 +50,25 @@ tests_menu() {
         draw_header "Тесты и диагностика" "Главная › Тесты"
 
         section "IP и репутация"
-        menu_item 1  "🌍" "IP Region"           "регион/город/хостер"
-        menu_item 2  "🚫" "IP Check Place"      "блокировки зарубежом"
-        menu_item 3  "🛡" "IPQuality"            "репутация IP"
+        menu_item 1  "🌍" "IP Region"           "Определение страны, региона, города и хостера сервера."
+        menu_item 2  "🚫" "IP Check Place"      "Проверка блокировок IP зарубежными сервисами (Netflix, OpenAI и др.)."
+        menu_item 3  "🛡" "IPQuality"           "Оценка репутации IP: спам, прокси, VPN, мошенничество."
 
         section "Цензура / DPI"
-        menu_item 4  "🔍" "Censorcheck геоблок"  "multitest"
-        menu_item 5  "🇷🇺" "Censorcheck DPI РФ"   "tlab.pw"
-        menu_item 6  "🔁" "Censorcheck alt"      "Nokola-Tesla"
+        menu_item 4  "🔍" "Censorcheck геоблок" "Проверка географических блокировок популярных сервисов."
+        menu_item 5  "🇷🇺" "Censorcheck DPI РФ"  "Проверка блокировок РКН на уровнях DNS, IP, HTTP, DPI."
+        menu_item 6  "🔁" "Censorcheck alt"     "Альтернативный чекер блокировок (Nokola-Tesla)."
 
         section "Скорость и пропускная"
-        menu_item 7  "🇷🇺" "iPerf3 → РФ"          "bench.tlab.pw"
-        menu_item 8  "🌐" "Speedtest → US/EU/AS" "speed.tlab.pw"
+        menu_item 7  "🇷🇺" "iPerf3 → РФ"         "Тест пропускной способности до российских серверов."
+        menu_item 8  "🌐" "Speedtest → US/EU/AS" "Тест скорости до серверов США, Европы и Азии."
 
         section "Бенчмарк железа"
-        menu_item 9  "⚡" "YABS"                 "полный бенч (5–10 мин)"
-        menu_item 10 "🧮" "sysbench CPU"         "быстрый тест проца"
+        menu_item 9  "⚡" "YABS"                "Полный бенчмарк сервера: диск, сеть, CPU (5–10 минут)."
+        menu_item 10 "🧮" "sysbench CPU"        "Быстрый однопоточный тест производительности процессора."
 
         draw_line
-        menu_item 0  "↩" "Назад"                ""
+        menu_item 0  "↩" "Назад"               "Вернуться в главное меню."
         draw_line
 
         local ch; prompt "Выбор:" ch

@@ -32,13 +32,13 @@ main_menu() {
         draw_line
 
         section "РАЗДЕЛЫ"
-        menu_item 1 "🔍" "Полезные команды"      "btop, порты, docker, логи"
-        menu_item 2 "📊" "Тесты и диагностика"   "IP, censorcheck, speed, YABS"
-        menu_item 3 "🚀" "Установки и защита"    "Node-Accelerator, TrafficGuard"
-        menu_item 4 "🎛" "Remnawave / Remnanode" "RemnaSetup, Reshala, Grace"
+        menu_item 1 "🔍" "Полезные команды"      "Мониторинг ресурсов, порты, Docker, логи системы."
+        menu_item 2 "📊" "Тесты и диагностика"   "IP-регион, censorcheck, speedtest, бенчмарк сервера."
+        menu_item 3 "🚀" "Установки и защита"    "Node-Accelerator (BBRv3), TrafficGuard от сканеров."
+        menu_item 4 "🎛" "Remnawave / Remnanode" "RemnaSetup, Reshala, Grace Access, логи и рестарт ноды."
 
         draw_line
-        menu_item 0 "⏻" "Выход" ""
+        menu_item 0 "⏻" "Выход" "Закрыть меню SpakieWW."
         draw_line
         printf '  %sv%s%s\n' "$C_DIM" "$SPAKIE_VERSION" "$C_RESET"
 

@@ -135,8 +135,19 @@ _info_remnanode_status() {
 
 # ---------- Публичные API ----------
 
+_info_section() {
+    # Заголовок секции в стиле  ═[ TITLE ]═══════
+    printf '\n  %s═[ %s%s%s ]══════════════════════════════════════════════%s\n' \
+        "$C_GRAY" "$C_BOLD$C_YELLOW" "$1" "$C_RESET$C_GRAY" "$C_RESET"
+}
+
+_info_row() {
+    # _info_row <label> <value>
+    # Метка фиксированной ширины + двоеточие + значение → всё по одной вертикали.
+    printf '  %s%-18s%s : %s\n' "$C_CYAN" "$1" "$C_RESET" "$2"
+}
+
 info_compact() {
-    # Полный info-блок для шапки главного меню (в столбик).
     _info_collect_ip
     local cpu mem_p mem_used mem_total disk_p disk_used disk_total
     cpu=$(_info_cpu_load)
@@ -145,27 +156,22 @@ info_compact() {
     local du dt
     du=$(_info_human_size "$disk_used"); dt=$(_info_human_size "$disk_total")
 
-    section "СИСТЕМА"
-    printf '  %-16s %s\n'          "ОС / Ядро"   "$(_info_os)"
-    printf '  %-16s %s\n'          "Аптайм"       "$(_info_uptime)"
-    printf '  %-16s %s\n'          "Виртуализация" "$(_info_virt)"
-    printf '  %-16s %s  %s[%s]%s\n' "IP / Гео" "${_INFO_IP_CACHE}" "$C_DIM" "${_INFO_GEO_CACHE}" "$C_RESET"
-    printf '  %-16s %s\n'          "Хостер"       "${_INFO_ASN_CACHE}"
+    _info_section "СИСТЕМА"
+    _info_row "ОС / Ядро"     "$(_info_os)"
+    _info_row "Аптайм"        "$(_info_uptime)"
+    _info_row "Виртуализация" "$(_info_virt)"
+    _info_row "IP / Гео"      "$(printf '%s  %s[%s]%s' "${_INFO_IP_CACHE}" "$C_DIM" "${_INFO_GEO_CACHE}" "$C_RESET")"
+    _info_row "Хостер"        "${_INFO_ASN_CACHE}"
 
-    section "ЖЕЛЕЗО"
-    printf '  %-16s %s\n' "CPU модель" "$(_info_cpu_model)"
-    printf '  %-16s %s %3s%% (%s ядер)\n' \
-        "Загрузка CPU" "$(_info_bar "$cpu" 14)" "$cpu" "$(_info_cpu_cores)"
-    printf '  %-16s %s %3s%% (%s / %s)\n' \
-        "Память (RAM)" "$(_info_bar "$mem_p" 14)" "$mem_p" "$mem_used" "$mem_total"
-    printf '  %-16s %s %3s%% (%s / %s)\n' \
-        "Диск /"        "$(_info_bar "$disk_p" 14)" "$disk_p" "$du" "$dt"
+    _info_section "ЖЕЛЕЗО"
+    _info_row "CPU модель"   "$(_info_cpu_model)"
+    _info_row "Загрузка CPU" "$(printf '%s %3s%% (%s ядер)'   "$(_info_bar "$cpu"    14)" "$cpu"    "$(_info_cpu_cores)")"
+    _info_row "Память (RAM)" "$(printf '%s %3s%% (%s / %s)'   "$(_info_bar "$mem_p"  14)" "$mem_p"  "$mem_used" "$mem_total")"
+    _info_row "Диск /"       "$(printf '%s %3s%% (%s / %s)'   "$(_info_bar "$disk_p" 14)" "$disk_p" "$du" "$dt")"
 
-    section "СТАТУС"
-    printf '  %-16s %s\n' "Remnanode" "$(_info_remnanode_status)"
+    _info_section "СТАТУС"
+    _info_row "Remnanode" "$(_info_remnanode_status)"
     local containers; containers=$(_info_docker_containers)
-    if [[ -n "$containers" ]]; then
-        printf '  %-16s %s\n' "Контейнеры" "$containers"
-    fi
+    [[ -n "$containers" ]] && _info_row "Контейнеры" "$containers"
 }
 

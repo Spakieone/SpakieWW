@@ -94,10 +94,15 @@ section() {
 
 menu_item() {
     # menu_item <num> <icon> <label> <hint>
-    printf '  %s%2s.%s %s %-28s %s%s%s\n' \
-        "$C_BOLD" "$1" "$C_RESET" \
-        "$2" "$3" \
-        "$C_DIM" "${4:+— $4}" "$C_RESET"
+    # Сверху: [N] icon  Название
+    # Снизу:        ↳ описание (серым)
+    printf '  %s[%s]%s %s %s%s%s\n' \
+        "$C_BOLD$C_CYAN" "$1" "$C_RESET" \
+        "$2" \
+        "$C_BOLD" "$3" "$C_RESET"
+    if [[ -n "${4:-}" ]]; then
+        printf '       %s↳ %s%s\n' "$C_DIM" "$4" "$C_RESET"
+    fi
 }
 
 # ---------- Навигация ----------
