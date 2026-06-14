@@ -28,10 +28,10 @@ _info_bar() {
     (( p >= 85 )) && color="$C_RED"
     local f="" e=""
     local i=0
-    while (( i < filled )); do f+="▰"; i=$((i+1)); done
+    while (( i < filled )); do f+="█"; i=$((i+1)); done
     i=0
-    while (( i < empty  )); do e+="▱"; i=$((i+1)); done
-    printf '%s%s%s%s%s' "$color" "$f" "$C_DIM" "$e" "$C_RESET"
+    while (( i < empty  )); do e+="░"; i=$((i+1)); done
+    printf '%s[%s%s%s%s%s]%s' "$C_DIM" "$color" "$f" "$C_DIM" "$e" "$C_DIM" "$C_RESET"
 }
 
 _info_collect_ip() {
@@ -168,9 +168,12 @@ info_compact() {
     _info_row "Хостер" "${_INFO_ASN_CACHE}"
 
     _info_section "ЖЕЛЕЗО"
-    _info_row "CPU"  "$(printf '%s %3s%%  %s%s%s' "$(_info_bar "$cpu"    8)" "$cpu"    "$C_DIM" "$(_info_cpu_model)" "$C_RESET")"
-    _info_row "RAM"  "$(printf '%s %3s%%  %s / %s'  "$(_info_bar "$mem_p"  8)" "$mem_p"  "$mem_used" "$mem_total")"
-    _info_row "Disk" "$(printf '%s %3s%%  %s / %s'  "$(_info_bar "$disk_p" 8)" "$disk_p" "$du" "$dt")"
+    local mem_str disk_str
+    mem_str=$(printf '%s / %s' "$mem_used" "$mem_total")
+    disk_str=$(printf '%s / %s' "$du" "$dt")
+    _info_row "CPU"  "$(printf '%s %3s%%  %s%s%s'         "$(_info_bar "$cpu"    8)" "$cpu"  "$C_DIM" "$(_info_cpu_model)" "$C_RESET")"
+    _info_row "RAM"  "$(printf '%s %3s%%  %-16s'           "$(_info_bar "$mem_p"  8)" "$mem_p" "$mem_str")"
+    _info_row "Disk" "$(printf '%s %3s%%  %-16s'           "$(_info_bar "$disk_p" 8)" "$disk_p" "$disk_str")"
 
     _info_section "STATUS"
     _info_row "Remnanode" "$(_info_remnanode_status)"

@@ -20,12 +20,21 @@ _t_ip_region() {
     pause
 }
 
-_t_ip_check_place() { _t_run "https://raw.githubusercontent.com/saveksme/multitest/main/scripts/ipcheckplace.sh" "IP Check Place"; }
-_t_ip_quality()     { _t_run "https://raw.githubusercontent.com/saveksme/multitest/main/scripts/ipquality.sh" "IPQuality"; }
+_t_multitest() {
+    # Запускает multitest и подсказывает, какой пункт выбрать.
+    local hint="${1:-выбери нужный пункт в меню}"
+    log_info "Подсказка: $hint"
+    sleep 1
+    bash <(curl -fsSL https://raw.githubusercontent.com/saveksme/multitest/master/multitest.sh) \
+        || log_warn "multitest завершился с ошибкой."
+    pause
+}
 
-_t_censor_geo()     { _t_run "https://raw.githubusercontent.com/saveksme/multitest/main/scripts/censorcheck-geo.sh" "Censorcheck геоблок"; }
+_t_ip_check_place() { _t_multitest "В открывшемся меню выбери 'IP Check Place' (блокировки зарубежом)"; }
+_t_ip_quality()     { _t_multitest "В открывшемся меню выбери 'IPQuality' (репутация IP)"; }
+_t_censor_geo()     { _t_multitest "В открывшемся меню выбери 'Censorcheck — геоблок'"; }
+
 _t_censor_dpi()     { _t_run "https://censorcheck.tlab.pw" "Censorcheck DPI РФ (tlab.pw)"; }
-_t_censor_alt()     { _t_run "https://raw.githubusercontent.com/Nokola-Tesla/censorcheck/main/censorcheck.sh" "Censorcheck alt (Nokola-Tesla)"; }
 
 _t_iperf_ru()       { _t_run "https://bench.tlab.pw" "iPerf3 → серверы РФ"; }
 _t_speed_world()    { _t_run "https://speed.tlab.pw" "Speedtest → US/EU/Asia"; }
@@ -57,15 +66,14 @@ tests_menu() {
         section "Цензура / DPI"
         menu_item 4  "🔍" "Censorcheck геоблок" "Проверка географических блокировок популярных сервисов."
         menu_item 5  "🇷🇺" "Censorcheck DPI РФ"  "Проверка блокировок РКН на уровнях DNS, IP, HTTP, DPI."
-        menu_item 6  "🔁" "Censorcheck alt"     "Альтернативный чекер блокировок (Nokola-Tesla)."
 
         section "Скорость и пропускная"
-        menu_item 7  "🇷🇺" "iPerf3 → РФ"         "Тест пропускной способности до российских серверов."
-        menu_item 8  "🌐" "Speedtest → US/EU/AS" "Тест скорости до серверов США, Европы и Азии."
+        menu_item 6  "🇷🇺" "iPerf3 → РФ"         "Тест пропускной способности до российских серверов."
+        menu_item 7  "🌐" "Speedtest → US/EU/AS" "Тест скорости до серверов США, Европы и Азии."
 
         section "Бенчмарк железа"
-        menu_item 9  "⚡" "YABS"                "Полный бенчмарк сервера: диск, сеть, CPU (5–10 минут)."
-        menu_item 10 "🧮" "sysbench CPU"        "Быстрый однопоточный тест производительности процессора."
+        menu_item 8  "⚡" "YABS"                "Полный бенчмарк сервера: диск, сеть, CPU (5–10 минут)."
+        menu_item 9  "🧮" "sysbench CPU"        "Быстрый однопоточный тест производительности процессора."
 
         draw_line
         menu_item 0  "↩" "Назад"               "Вернуться в главное меню."
@@ -78,11 +86,10 @@ tests_menu() {
             3)  _t_ip_quality ;;
             4)  _t_censor_geo ;;
             5)  _t_censor_dpi ;;
-            6)  _t_censor_alt ;;
-            7)  _t_iperf_ru ;;
-            8)  _t_speed_world ;;
-            9)  _t_yabs ;;
-            10) _t_sysbench ;;
+            6)  _t_iperf_ru ;;
+            7)  _t_speed_world ;;
+            8)  _t_yabs ;;
+            9)  _t_sysbench ;;
             0|q|Q|"") return 0 ;;
             *) log_warn "Нет такого пункта."; sleep 0.8 ;;
         esac
