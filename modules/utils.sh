@@ -59,11 +59,12 @@ pkg_install() {
 TERM_WIDTH() { tput cols 2>/dev/null || echo 80; }
 
 draw_line() {
-    local ch="${1:-─}" color="${2:-$C_GRAY}"
+    local color="${1:-$C_GRAY}"
     local w; w=$(TERM_WIDTH)
-    printf '%s' "$color"
-    printf '%*s' "$w" '' | tr ' ' "$ch"
-    printf '%s\n' "$C_RESET"
+    local line=""
+    local i=0
+    while (( i < w )); do line+="─"; i=$((i+1)); done
+    printf '%s%s%s\n' "$color" "$line" "$C_RESET"
 }
 
 draw_header() {
@@ -77,14 +78,14 @@ draw_header() {
     printf '  %s%s╚════██║██╔═══╝ ██╔══██║██╔═██╗ ██║██╔══╝  %s\n' "$C_BOLD" "$C_CYAN" "$C_RESET"
     printf '  %s%s███████║██║     ██║  ██║██║  ██╗██║███████╗%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET"
     printf '  %s%s╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET"
-    printf '  %sby Spakie%s\n\n' "$C_DIM" "$C_RESET"
+    printf '\n'
     if [[ -n "$crumb" ]]; then
         printf '  %s%s%s\n' "$C_DIM" "$crumb" "$C_RESET"
     fi
     if [[ -n "$title" ]]; then
         printf '  %s%s%s\n' "$C_BOLD" "$title" "$C_RESET"
     fi
-    draw_line '─' "$C_GRAY"
+    draw_line
 }
 
 section() {

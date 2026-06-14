@@ -55,12 +55,13 @@ find "$DEST/modules" -type f -name '*.sh' -exec chmod +x {} \;
 ln -sf "$DEST/main.sh" "$BIN"
 say "Команда установлена: $BIN"
 
-cat <<EOF
+say "SpakieWW установлен. Запускаю..."
+sleep 1
 
-${c_c}SpakieWW${c_n} установлен.
-
-Запуск:  ${c_g}spakie${c_n}
-Каталог: $DEST
-Обновление: повторно запустить этот установщик.
-
-EOF
+# Запускаем меню в текущем терминале. Если stdin не TTY (curl|bash без <()),
+# подсовываем /dev/tty, иначе read внутри меню не сработает.
+if [[ -t 0 ]]; then
+    exec "$BIN"
+else
+    exec "$BIN" </dev/tty
+fi

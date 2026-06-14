@@ -26,12 +26,12 @@ _info_bar() {
     local color="$C_GREEN"
     (( p >= 60 )) && color="$C_YELLOW"
     (( p >= 85 )) && color="$C_RED"
-    printf '%s[' "$C_DIM"
-    printf '%s' "$color"
-    printf '%*s' "$filled" '' | tr ' ' '█'
-    printf '%s' "$C_DIM"
-    printf '%*s' "$empty" '' | tr ' ' '░'
-    printf ']%s' "$C_RESET"
+    local f="" e=""
+    local i=0
+    while (( i < filled )); do f+="█"; i=$((i+1)); done
+    i=0
+    while (( i < empty  )); do e+="░"; i=$((i+1)); done
+    printf '%s[%s%s%s%s%s]%s' "$C_DIM" "$color" "$f" "$C_DIM" "$e" "$C_DIM" "$C_RESET"
 }
 
 _info_collect_ip() {
