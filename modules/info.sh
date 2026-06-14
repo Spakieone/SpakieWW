@@ -28,10 +28,10 @@ _info_bar() {
     (( p >= 85 )) && color="$C_RED"
     local f="" e=""
     local i=0
-    while (( i < filled )); do f+="█"; i=$((i+1)); done
+    while (( i < filled )); do f+="▰"; i=$((i+1)); done
     i=0
-    while (( i < empty  )); do e+="░"; i=$((i+1)); done
-    printf '%s[%s%s%s%s%s]%s' "$C_DIM" "$color" "$f" "$C_DIM" "$e" "$C_DIM" "$C_RESET"
+    while (( i < empty  )); do e+="▱"; i=$((i+1)); done
+    printf '%s%s%s%s%s' "$color" "$f" "$C_DIM" "$e" "$C_RESET"
 }
 
 _info_collect_ip() {
@@ -144,11 +144,20 @@ _info_section() {
 _info_row() {
     # _info_row <label> <value>
     # │  Метка     ▸ Значение
-    printf '  %s│%s  %s%-8s%s %s▸%s %s\n' \
+    # printf %-Ns считает байты, а кириллица в UTF-8 занимает 2 байта на символ —
+    # отсюда едет вертикаль. Добиваем пробелы вручную по числу символов.
+    local label="$1" value="$2"
+    local width=10
+    local len; len=$(printf '%s' "$label" | wc -m)
+    local pad=$(( width - len ))
+    (( pad < 0 )) && pad=0
+    local spaces=""
+    while (( pad > 0 )); do spaces+=" "; pad=$((pad-1)); done
+    printf '  %s│%s  %s%s%s%s %s▸%s %s\n' \
         "$C_GRAY" "$C_RESET" \
-        "$C_CYAN" "$1" "$C_RESET" \
+        "$C_CYAN" "$label" "$C_RESET" "$spaces" \
         "$C_DIM" "$C_RESET" \
-        "$2"
+        "$value"
 }
 
 info_compact() {
@@ -168,12 +177,16 @@ info_compact() {
     _info_row "Хостер" "${_INFO_ASN_CACHE}"
 
     _info_section "ЖЕЛЕЗО"
-    local mem_str disk_str
+    local mem_str disk_str cpu_pct mem_pct disk_pct
     mem_str=$(printf '%s / %s' "$mem_used" "$mem_total")
     disk_str=$(printf '%s / %s' "$du" "$dt")
-    _info_row "CPU"  "$(printf '%s %3s%%  %s%s%s'         "$(_info_bar "$cpu"    8)" "$cpu"  "$C_DIM" "$(_info_cpu_model)" "$C_RESET")"
-    _info_row "RAM"  "$(printf '%s %3s%%  %-16s'           "$(_info_bar "$mem_p"  8)" "$mem_p" "$mem_str")"
-    _info_row "Disk" "$(printf '%s %3s%%  %-16s'           "$(_info_bar "$disk_p" 8)" "$disk_p" "$disk_str")"
+    # Процент строго 4 символа: "  2%", " 25%", "100%" — следующая колонка не едет.
+    cpu_pct=$(printf '%3d%%' "$cpu")
+    mem_pct=$(printf '%3d%%' "$mem_p")
+    disk_pct=$(printf '%3d%%' "$disk_p")
+    _info_row "CPU"  "$(printf '%s %s  %s%s%s'   "$(_info_bar "$cpu"    8)" "$cpu_pct"  "$C_DIM" "$(_info_cpu_model)" "$C_RESET")"
+    _info_row "RAM"  "$(printf '%s %s  %s'       "$(_info_bar "$mem_p"  8)" "$mem_pct"  "$mem_str")"
+    _info_row "Disk" "$(printf '%s %s  %s'       "$(_info_bar "$disk_p" 8)" "$disk_pct" "$disk_str")"
 
     _info_section "STATUS"
     _info_row "Remnanode" "$(_info_remnanode_status)"
