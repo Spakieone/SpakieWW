@@ -31,12 +31,11 @@ main_menu() {
         info_compact
         draw_line
 
-        section "Разделы"
+        section "РАЗДЕЛЫ"
         menu_item 1 "🔍" "Полезные команды"      "btop, порты, docker, логи"
         menu_item 2 "📊" "Тесты и диагностика"   "IP, censorcheck, speed, YABS"
         menu_item 3 "🚀" "Установки и защита"    "Node-Accelerator, TrafficGuard"
         menu_item 4 "🎛" "Remnawave / Remnanode" "RemnaSetup, Reshala, Grace"
-        menu_item 5 "🧾" "Инфо о сервере"        "полный отчёт"
 
         draw_line
         menu_item 0 "⏻" "Выход" ""
@@ -49,7 +48,6 @@ main_menu() {
             2) tests_menu ;;
             3) install_menu ;;
             4) remnawave_menu ;;
-            5) info_full ;;
             0|q|Q|exit) printf '\n  %sДо встречи.%s\n' "$C_CYAN" "$C_RESET"; exit 0 ;;
             "") ;;
             *) log_warn "Нет такого пункта."; sleep 0.8 ;;
