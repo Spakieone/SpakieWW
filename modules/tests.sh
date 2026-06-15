@@ -4,35 +4,33 @@
 _t_run() { run_remote "$1" "$2"; pause; }
 
 _t_ip_region() {
-    log_info "Определяю регион IP..."
+    log_info "Запускаю IP Region..."
+    pkg_install wget wget >/dev/null
+    bash <(wget -qO- https://ipregion.vrnt.xyz) || log_warn "Скрипт завершился с ошибкой."
+    pause
+}
+
+_t_ip_check_place() {
+    log_info "Запускаю IP Check Place..."
     pkg_install curl curl >/dev/null
-    local ip; ip=$(curl -fsS --max-time 5 https://api.ipify.org || echo "—")
-    local json; json=$(curl -fsS --max-time 5 "https://ipinfo.io/${ip}/json" 2>/dev/null || echo "")
-    printf '\n  %sIP:%s        %s\n' "$C_BOLD" "$C_RESET" "$ip"
-    if [[ -n "$json" ]]; then
-        printf '  %sСтрана:%s    %s\n' "$C_BOLD" "$C_RESET" "$(grep -oP '"country":\s*"\K[^"]+' <<<"$json")"
-        printf '  %sРегион:%s    %s\n' "$C_BOLD" "$C_RESET" "$(grep -oP '"region":\s*"\K[^"]+' <<<"$json")"
-        printf '  %sГород:%s     %s\n' "$C_BOLD" "$C_RESET" "$(grep -oP '"city":\s*"\K[^"]+'   <<<"$json")"
-        printf '  %sХостер:%s    %s\n' "$C_BOLD" "$C_RESET" "$(grep -oP '"org":\s*"\K[^"]+'    <<<"$json")"
-    else
-        log_warn "ipinfo.io недоступен."
-    fi
+    bash <(curl -Ls IP.Check.Place) -l en || log_warn "Скрипт завершился с ошибкой."
     pause
 }
 
-_t_multitest() {
-    # Запускает multitest и подсказывает, какой пункт выбрать.
-    local hint="${1:-выбери нужный пункт в меню}"
-    log_info "Подсказка: $hint"
-    sleep 1
-    bash <(curl -fsSL https://raw.githubusercontent.com/saveksme/multitest/master/multitest.sh) \
-        || log_warn "multitest завершился с ошибкой."
+_t_ip_quality() {
+    log_info "Запускаю IPQuality..."
+    pkg_install curl curl >/dev/null
+    bash <(curl -Ls https://Check.Place) -EI || log_warn "Скрипт завершился с ошибкой."
     pause
 }
 
-_t_ip_check_place() { _t_multitest "В открывшемся меню выбери 'IP Check Place' (блокировки зарубежом)"; }
-_t_ip_quality()     { _t_multitest "В открывшемся меню выбери 'IPQuality' (репутация IP)"; }
-_t_censor_geo()     { _t_multitest "В открывшемся меню выбери 'Censorcheck — геоблок'"; }
+_t_censor_geo() {
+    log_info "Запускаю Censorcheck — геоблок..."
+    pkg_install wget wget >/dev/null
+    bash <(wget -qO- https://github.com/vernette/censorcheck/raw/master/censorcheck.sh) --mode geoblock \
+        || log_warn "Скрипт завершился с ошибкой."
+    pause
+}
 
 _t_censor_dpi()     { _t_run "https://censorcheck.tlab.pw" "Censorcheck DPI РФ (tlab.pw)"; }
 
